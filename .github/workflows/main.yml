@@ -58,7 +58,7 @@ jobs:
               run: bash update_hostsfile.sh
 
             - name: Traffic Generation
-              run : bash test.sh
+              run : bash traffic.sh
 
 
 
