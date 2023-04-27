@@ -1,27 +1,25 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  bar-app
-  namespace: default
+  name:  echo-foo
   labels:
-    app:  bar-app
+    app:  foo
 spec:
   selector:
     matchLabels:
-      app: bar-app
+      app: foo
+  replicas: 1
   template:
     metadata:
       labels:
-        app:  bar-app
+        app:  foo
     spec:
       containers:
-      - image: hashicorp/http-echo:latest
+      - name:  foo
+        image:  hashicorp/http-echo
+        args: ['-text="foo"']
         imagePullPolicy: IfNotPresent
-        name: "bar"
-        args:  
-        - "-text=bar"
-        ports:
-        - containerPort: 5678
         resources:
           requests:
             cpu: 100m
@@ -29,21 +27,19 @@ spec:
           limits:
             cpu: 100m
             memory: 100Mi
-      
+        ports:
+        - containerPort:  5678
       restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: bar-service
-  namespace: default
+  name: echo-foo-svc
 spec:
   selector:
-    app: bar-app
+    app: foo
   type: ClusterIP
-  ports:  
-  - name: http
-    port: 8088
-    targetPort: 5678
-    protocol: TCP
-   
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 5678

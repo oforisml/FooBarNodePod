@@ -1,0 +1,67 @@
+name: FooBar Http-Echo CI
+
+on:
+    push:
+        branches: 
+            - main
+    pull_request:
+        branches: 
+            - main
+
+jobs:
+    CI:
+        runs-on: ubuntu-latest
+        env:
+            ACTIONS_STEP_DEBUG: true
+            ACTIONS_RUNNER_DEBUG: true
+        steps:
+            - name: Clone Repo
+              uses: actions/checkout@v3
+       
+            - name: Setup Docker
+              uses: docker/setup-qemu-action@v2
+
+            - name: Install KinD
+              run: |
+                curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.18.0/kind-linux-amd64
+                chmod +x ./kind
+                sudo mv ./kind /usr/local/bin/kind
+            
+            - name: Install Kubectl
+              run: |
+                curl -LO https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubectl
+                sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+            - name: Install Helm
+              run: |
+                curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+                chmod 700 get_helm.sh
+                ./get_helm.sh
+                rm get_helm.sh
+
+            - name: Create KinD Cluster
+              run:  kind create cluster --config kindCluster/config.yml
+
+            - name: Deploy Ingress Controller
+              run: bash install_ingress.sh
+
+            - name: Deploy FooBar
+              run : bash deploy_foobar.sh
+
+            - name: Setup metalLB
+              run: bash setup_metalLB.sh
+
+            - name: Grace Period
+              run : sleep 40
+
+            - name: Update hosts file with hostnames
+              run: bash update_hostsfile.sh
+
+            - name: Test Deployment
+              run : |
+                curl foo.localhost
+                curl bar.localhost
+
+
+
+

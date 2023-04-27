@@ -1,4 +1,5 @@
 #!/bin/bash
+
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
 
 kubectl wait --namespace metallb-system \
@@ -6,7 +7,6 @@ kubectl wait --namespace metallb-system \
                 --selector=app=metallb \
                 --timeout=90s
 
+# docker network inspect -f '{{.IPAM.Config}}' kind
 
-docker network inspect -f '{{.IPAM.Config}}' kind
-
-kubectl apply -f https://kind.sigs.k8s.io/examples/loadbalancer/metallb-config.yaml
+kubectl apply -f LB/metalLB.yml
