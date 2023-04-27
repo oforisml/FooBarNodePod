@@ -60,6 +60,8 @@ jobs:
             - name: Traffic Generation
               run : bash traffic.sh
 
-
-
+            - name: Comment Pull Request
+              uses: thollander/actions-comment-pull-request@v2
+              with:
+                filePath: ./load_test_results.txt
 
