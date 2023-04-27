@@ -1,0 +1,95 @@
+name: Foo-Bar Github Actions Test
+on: [pull_request, push]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    # runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      
+      - name: Install Docker
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Install Kind
+      #I am using a macbook locally hence the usage of 'brew'
+        run: |
+          brew install kind  
+
+
+      - name: Creating the Cluster
+        run: |
+          KIND_CLUSTER_NAME=foo-bar-cluster-lb
+
+          if [ "$(kind get clusters | grep $KIND_CLUSTER_NAME)" == "$KIND_CLUSTER_NAME" ]; then
+            echo "Cluster already exists."
+          else
+            echo "Creating cluster..."
+              kind create cluster --name $KIND_CLUSTER_NAME --config ./k8s/config/myCluster.yaml
+          fi
+
+
+      - name:  INGRESS-CONTROLLER INSTALLATION
+        run: |
+
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+          
+          echo "waiting for ingress ingress controller!..."
+          kubectl wait --namespace ingress-nginx --for=condition=ready pod \
+          --selector=app.kubernetes.io/component=controller \
+          --timeout=360s
+
+      # - name: INGRESS-CONTROLLER SERVICE
+      #   run: |
+      #       kubectl apply -f ./k8s/ingress-controller-service.yaml 
+
+      - name: INSTALLING METALLB
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
+
+
+          echo "WAIT FOR METALLB"
+            kubectl wait pods -n metallb-system -l app=metallb --for condition=Ready --timeout=360s
+
+          
+          echo "GET KIND IP"
+          ip_subclass=$(docker network inspect kind -f '{{index .IPAM.Config 0 "Subnet"}}' | awk -F. '${printf "%d.%d\n", $1,$2}')
+
+          echo "CREATING KIND IP POOL"
+      
+          cat << EOF | kubectl apply -f=-
+          apiVersion: metallb.io/v1beta1
+          kind: IPAddressPool
+          metadata:
+            name: default
+            namespace: metallb-system
+          spec:
+            addresses:
+            - ${ip_sublass}.255.200-${ip_subclass}.255.250
+            autoAssign: true
+          ---
+          apiVersion: metallb.io/v1beta1
+          kind: L2Advertisement
+          metadata:
+            name: default
+            namespace: metallb-system
+          spect:
+            ipAddressPools:
+              - default
+          EOF
+
+
+      - name: DEPLOYING FOO 
+        run: kubectl apply -f ./k8s/foo-deployment.yaml 
+
+      - name: DEPLOYING BAR
+        run: | 
+            kubectl apply -f ./k8s/bar-deployment.yaml 
+           
+      - name: FOO & BAR INGRESS
+        run: |
+            docker network inspect  
+            kubectl apply -f ./k8s/ingress.yaml
+          

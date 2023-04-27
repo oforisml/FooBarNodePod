@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# RUNNING THE CREATE CLUSTER SCRIPT
+./create_cluster.sh
+
+# RUNNING THE INGRESS INSTALLATION SCRIPT
+./installing-ingresss.sh
+
+# STARTING THE DEPLOYMENTS AND SERVICES
+./start.sh

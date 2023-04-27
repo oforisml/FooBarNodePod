@@ -1,0 +1,47 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  labels:
+    app.name: "foo"
+  name: "foo"
+spec:
+  replicas: 2
+  selector:
+    matchLabels: 
+      app.name: "foo"
+  template:
+    metadata:
+      labels:
+        app.name: "foo"
+    spec:
+      containers:
+      - image: hashicorp/http-echo:latest
+        imagePullPolicy: IfNotPresent
+        name: "foo"
+        args:  
+        - "-text=Foo"
+        ports:
+        - containerPort: 5678
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+            
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:  
+  name: foo-service
+spec:
+  selector:    
+    app.name: "foo"
+  type: ClusterIP
+  ports:  
+  - name: http
+    port: 8080
+    targetPort: 5678
+    protocol: TCP
