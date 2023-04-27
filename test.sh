@@ -1,4 +1,7 @@
 
 
-curl foo.localhost
-curl bar.localhost
+for _ in {1..1000}
+    do
+        curl -s foo.localhost
+        curl -s bar.localhost
+    done

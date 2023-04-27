@@ -1,6 +1,6 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
-name: "asake"
+name: cyclone
 networking:
   ipFamily: dual
 nodes:

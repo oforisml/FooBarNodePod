@@ -57,10 +57,8 @@ jobs:
             - name: Update hosts file with hostnames
               run: bash update_hostsfile.sh
 
-            - name: Test Deployment
-              run : |
-                curl foo.localhost
-                curl bar.localhost
+            - name: Traffic Generation
+              run : bash test.sh
 
 
 
