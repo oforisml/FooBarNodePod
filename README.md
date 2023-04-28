@@ -38,9 +38,14 @@ The github actions job is triggered on pull request and when the request is appr
 
 ## Directories Structure
 ` .github/ ` contains the parent directory of the GA workflow.  
+
 ` charts/ ` houses the ingress controller helm chart with its values  
+
 ` k6 ` contains a bash script that executes to generate a json file to test the load in the CI  
+
 ` k8 ` contains the .yaml files that has both the kind ` Service ` and kind ` Deployment ` of the two *http-echo* servers and it finally contains the kind ` Ingress ` which serves a gateway for traffic intake.  
+
 ` kindCluster ` has the configuration file for creating the cluster. This creates one master node and three worker nodes.  
+
 ` LB ` contains the worker a .yaml file that creaes an *ip address pool* for the metallb which is a load balancer because this kubernetes cluster is not on a cloud provider hence for the ingress controller to have a load balancer, there was a need to install metallb which gave a cluster wide load balancer to be used by the ingress controller.
 
