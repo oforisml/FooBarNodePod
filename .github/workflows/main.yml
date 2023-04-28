@@ -64,6 +64,7 @@ jobs:
             - name: Comment Pull Request
               uses: thollander/actions-comment-pull-request@v2
               with:
+                header: "Pull Request"
                 filePath: response.txt
 
 
