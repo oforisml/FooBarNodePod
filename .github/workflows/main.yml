@@ -1,16 +1,19 @@
 name: FooBar Http-Echo CI
 
 on:
-    push:
-        branches: 
-            - main
+    # push:
+    #     branches: 
+    #         - main
     pull_request:
         branches: 
             - main
 
+
 jobs:
     CI:
         runs-on: ubuntu-latest
+        permissions:
+          pull-requests: write
         env:
             ACTIONS_STEP_DEBUG: true
             ACTIONS_RUNNER_DEBUG: true
@@ -58,6 +61,10 @@ jobs:
             - name: Cat Content of response.txt
               run: cat response.txt
 
+            - name: Comment Pull Request
+              uses: thollander/actions-comment-pull-request@v2
+              with:
+                filePath: response.txt
 
 
            
