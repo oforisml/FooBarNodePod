@@ -55,11 +55,8 @@ jobs:
             - name: Update hosts file with hostnames
               run: bash update_hostsfile.sh
 
-            - name: Traffic Generation
+            - name: Traffic Load Test
               run : bash ./k6/summary.sh
-
-            - name: Cat Content of response.txt
-              run: cat response.txt
 
             - name: Comment Pull Request
               uses: thollander/actions-comment-pull-request@v2
@@ -68,9 +65,3 @@ jobs:
                 filePath: response.txt
 
 
-           
-
-
-          
-
-            
