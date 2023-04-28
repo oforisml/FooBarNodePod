@@ -1,9 +1,9 @@
 name: FooBar Http-Echo CI
 
 on:
-    # push:
-    #     branches: 
-    #         - main
+    push:
+        branches: 
+            - main
     pull_request:
         branches: 
             - main
@@ -60,8 +60,14 @@ jobs:
             - name: Traffic Generation
               run : bash traffic.sh
 
-            - name: Comment Pull Request
-              uses: thollander/actions-comment-pull-request@v2
-              with:
-                filePath: ./load_test_results.txt
+            - name: Load Test Summary
+              run: ./k6/summary.sh
 
+            # - name: Comment Pull Request
+            #   uses: thollander/actions-comment-pull-request@v2
+            #   with:
+            #     filePath: ./response.txt
+            - name: Echo Response
+              run: cat response.txt
+
+            
