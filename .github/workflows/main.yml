@@ -21,31 +21,24 @@ jobs:
             - name: Setup Docker
               uses: docker/setup-qemu-action@v2
 
-            # - name: Install KinD
-            #   run: |
-            #     curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.18.0/kind-linux-amd64
-            #     chmod +x ./kind
-            #     sudo mv ./kind /usr/local/bin/kind
-            
-            # - name: Install Kubectl
-            #   run: |
-            #     curl -LO https://dl.k8s.io/release/v1.27.0/bin/linux/amd64/kubectl
-            #     sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-
-            # - name: Install Helm
-            #   run: |
-            #     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-            #     chmod 700 get_helm.sh
-            #     ./get_helm.sh
-            #     rm get_helm.sh
-            - name: Installing K6
-              run: sudo apt-get update && sudo apt-get install -y k6
+            - name: Install K6
+              run: |
+                sudo gpg -k
+                sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+                echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+                sudo apt-get update
+                sudo apt-get install k6
+           
 
             - name: Create KinD Cluster
               run:  kind create cluster --config kindCluster/config.yml
 
             - name: Deploy Ingress Controller
               run: bash install_ingress.sh
+
+            # This give the ingress just a little breathing space.
+            - name: Relax for Ingress 
+              run: sleep 10
 
             - name: Deploy FooBar
               run : bash deploy_foobar.sh
@@ -54,22 +47,22 @@ jobs:
               run: bash setup_metalLB.sh
 
             - name: Grace Period
-              run : sleep 40
+              run : sleep 20
 
             - name: Update hosts file with hostnames
               run: bash update_hostsfile.sh
 
             - name: Traffic Generation
-              run : bash traffic.sh
+              run : bash ./k6/summary.sh
 
-            - name: Load Test Summary
-              run: ./k6/summary.sh
-
-            # - name: Comment Pull Request
-            #   uses: thollander/actions-comment-pull-request@v2
-            #   with:
-            #     filePath: ./response.txt
-            - name: Echo Response
+            - name: Cat Content of response.txt
               run: cat response.txt
+
+
+
+           
+
+
+          
 
             

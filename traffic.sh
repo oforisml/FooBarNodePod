@@ -2,7 +2,7 @@
 
 results="load_test_results.txt"
 
-for i in {1..1000}; do
+for i in {1..10}; do
   if (( RANDOM % 2 )); then
     host="foo.localhost"
   else
