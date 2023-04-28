@@ -61,7 +61,7 @@ The github actions job is triggered on pull request and when the request is appr
           
 
 
-# GITHUB ACTIONS FLOW
+# Github Actions Flow
 The flow is located in the **`.github/workflow`** directory.
 This contains the .yaml file which has the entire CI flow.
 
