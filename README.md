@@ -58,10 +58,9 @@ The github actions job is triggered on pull request and when the request is appr
 **`update_hostfile.sh`**  adds the ip address of the load balancer to the host file of the server for both http-echo servers.
 
 **`traffic.sh`** is just curls the both `foo.localhost` and `bar.localhost`. 
+          
 
-           
 
-           
 # GITHUB ACTIONS FLOW
 The flow is located in the **`.github/workflow`** directory.
 This contains the .yaml file which has the entire CI flow.
